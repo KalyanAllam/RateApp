@@ -6,10 +6,7 @@
 
 @using RateApp.Models;
 
-@jsonstring
-
-
-@Questions
+ 
 
 <table class="table">
     <thead>
@@ -25,18 +22,18 @@
 @foreach (InQuestion inques in Questions)
 {
     // Pass the Dto properties to the component
-    <InQuestion  DaysBegin="@inques.DaysBegin" DaysEnd="@inques.DaysEnd"   Interest="@inques.Interest"   SrInterest="@inques.SrInterest"/>
-}
+     <tr>
+                <td>@inques.DaysBegin</td>
+                <td>@inques.DaysEnd</td>
+                <td>@inques.Interest</td>
+                <td>@inques.SrInterest</td>
+            </tr>}
 </tbody>
 </table>
 
 @code {
      public class InQuestion
-    {
-
-
-
-
+  { 
         public int No { get; set; }
 
         public int DaysBegin { get; set; }
@@ -50,11 +47,11 @@
     }
      
 
-
+ 
 
     public string codex; public string  jsonstring ; public bool statcode;
      List<InQuestion> Questions = new List<InQuestion>();
-     public int number; int totalquestions;
+     public int number; int totalquestions;     int     maxnumber;
      protected override async Task OnInitializedAsync()
     {
 
@@ -81,11 +78,15 @@
                     //Storing the response details recieved from web api
                       jsonstring = await response.Content.ReadAsStringAsync();
                      
-                       
-                       
-                       Questions = JsonConvert.DeserializeObject<List<InQuestion>>(jsonstring);
+                        try
+            {
+                   Questions = JsonConvert.DeserializeObject<List<InQuestion>>(jsonstring);
 
-
+ 
+            }
+            catch (Exception ex)
+            {   }
+// maxnumber=(from e in Questions select e.No).Max();
 
                 }
             }
