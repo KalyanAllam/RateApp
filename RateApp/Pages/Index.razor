@@ -5,17 +5,17 @@
 @using Newtonsoft.Json;
 
 @using RateApp.Models;
-
  
-
+ 
+ 
 <table class="table">
     <thead>
         <tr>
            
-            <th>DaysBegin</th>
-            <th>DaysEnd</th>
-            <th>Interest</th>
-            <th>SrInterest</th>
+            <th>Year</th>
+             
+            <th>Interest p.a</th>
+             
         </tr>
     </thead>
 <tbody>
@@ -24,16 +24,54 @@
     // Pass the Dto properties to the component
      <tr>
                 <td>@inques.DaysBegin</td>
-                <td>@inques.DaysEnd</td>
+                
                 <td>@inques.Interest</td>
-                <td>@inques.SrInterest</td>
+                 
             </tr>}
 </tbody>
 </table>
+ 
+ 
+<div class="row">
+      
+    <div class="col-md-3">
+        <p>Deposit Amount</p>
+    </div>
+ 
+<input type="range" min="1000" max="20000" step="1000" @bind="@amount" 
+@bind:event="oninput"/>
 
+<p>@amount</p>
+</div>
+
+<br />
+<div class="row">
+  <p>Years:</p>
+<input type="range" min="1" max="5" step="1" @bind="@years" 
+@bind:event="oninput"/>
+</div>
+
+<p>@years</p>
+
+@if (listcount > 0)
+{
+    <div>
+        <button type="submit"    @onclick="Submit" >Submit</button>
+    </div>
+}
+
+<div>
+    <div class="col-md-3">
+        <p>Interest(Monthly Payout Not Compounded)</p>
+    </div>
+    <div>@final</div>
+    
+</div>
+  
+ 
 @code {
-     public class InQuestion
-  { 
+    public class InQuestion
+    { 
         public int No { get; set; }
 
         public int DaysBegin { get; set; }
@@ -45,14 +83,18 @@
         public decimal SrInterest { get; set; }
 
     }
-     
 
- 
 
+
+  public int listcount; public int totfinal;
     public string codex; public string  jsonstring ; public bool statcode;
-     List<InQuestion> Questions = new List<InQuestion>();
-     public int number; int totalquestions;     int     maxnumber;
-     protected override async Task OnInitializedAsync()
+    List<InQuestion> Questions = new List<InQuestion>();
+    public int number;int years =1;decimal interest; int totalquestions;     int     maxnumber;int amount=1000; decimal imint;int final;
+
+
+
+
+    protected override async Task OnInitializedAsync()
     {
 
 
@@ -63,40 +105,77 @@
 
         using (var client1 = new HttpClient())
         {
-            
+
+
+
+            client1.BaseAddress = new Uri(jwturl);
+
+            client1.DefaultRequestHeaders.Clear();
+            client1.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            HttpResponseMessage response = await client1.GetAsync("RateCards");
+
+            if (response.IsSuccessStatusCode)
+            {
+                //Storing the response details recieved from web api
+                jsonstring = await response.Content.ReadAsStringAsync();
+
+                try
+                {
+                    Questions = JsonConvert.DeserializeObject<List<InQuestion>>(jsonstring);
+                    Questions =Questions.OrderBy(x => x.DaysBegin).ToList();
+                    listcount = Questions.Count();
+
+
+
+
+               
+                }
+                catch (Exception ex)
+                {   }
+              
+
+            }
+        }
+
+
+
+
+
+    }
+
+
+
+
+
+
+
+    private void Submit()
+    {
+
+        try
+        { 
+             
+    var    imint  =  (from l in Questions
+                       where l.DaysBegin == years
+                       select l.Interest).FirstOrDefault() ; 
+
+               
+      
+        decimal amt = amount;
+      
+       decimal  finint= Decimal.Multiply(amt, imint)   ;   
+        interest=Decimal.Multiply( finint,years);
+         final= (int)Math.Round((interest/100));
+        }
+        catch (Exception ex)
+        {
 
               
-                client1.BaseAddress = new Uri(jwturl);
+        }
 
-                client1.DefaultRequestHeaders.Clear();
-                client1.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                 HttpResponseMessage response = await client1.GetAsync("RateCards");
-             
-                if (response.IsSuccessStatusCode)
-                {
-                    //Storing the response details recieved from web api
-                      jsonstring = await response.Content.ReadAsStringAsync();
-                     
-                        try
-            {
-                   Questions = JsonConvert.DeserializeObject<List<InQuestion>>(jsonstring);
-
- 
-            }
-            catch (Exception ex)
-            {   }
-// maxnumber=(from e in Questions select e.No).Max();
-
-                }
-            }
-            
-
-   
-   
-        
     }
-  }
+}
 
 
  
