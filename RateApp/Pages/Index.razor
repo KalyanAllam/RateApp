@@ -38,8 +38,8 @@
         <p>Deposit Amount</p>
     </div>
  
-<input type="range" min="1000" max="20000" step="1000" @bind="@amount" 
-@bind:event="oninput"/>
+<input type="range" min="1000" max="20000" step="1000" @bind="@amount"
+    @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
 
 <p>@amount</p>
 </div>
@@ -47,22 +47,17 @@
 <br />
 <div class="row">
   <p>Years:</p>
-<input type="range" min="1" max="5" step="1" @bind="@years" 
-@bind:event="oninput"/>
+<input type="range" min="1" max="5" step="1" @bind="@years"
+    @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
 </div>
 
 <p>@years</p>
 
-@if (listcount > 0)
-{
-    <div>
-        <button type="submit"    @onclick="Submit" >Submit</button>
-    </div>
-}
+ 
 
 <div>
     <div class="col-md-3">
-        <p>Interest(Monthly Payout Not Compounded)</p>
+        <p>Total Interest(Monthly Payout and not compounded)</p>
     </div>
     <div>@final</div>
     
@@ -150,7 +145,7 @@
 
 
 
-    private void Submit()
+    private void UpdateCurrentInterestValue()
     {
 
         try
