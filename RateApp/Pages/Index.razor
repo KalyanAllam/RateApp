@@ -35,10 +35,10 @@
 <div class="row">
       
     <div class="col-md-3">
-        <p>Deposit Amount</p>
+        <p>Deposit Amount INR</p>
     </div>
  
-<input type="range" min="1000" max="20000" step="1000" @bind="@amount"
+<input type="range" min="5000" max="50000" step="5000" @bind="@amount"
     @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
 
 <p>@amount</p>
@@ -54,15 +54,20 @@
 <p>@years</p>
 
  
-
+@if(listcount>0)
+{ 
 <div>
     <div class="col-md-3">
-        <p>Total Interest(Monthly Payout and not compounded)</p>
+        <p>Total Amount INR(Rounded, Simple and not compounded)</p>
     </div>
     <div>@final</div>
+        <div class="col-md-3">
+            <p>Total Amount INR(Rounded ,Compunded Halfyearly)</p>
+        </div>
+        <div>@finalcompound</div>
     
 </div>
-  
+}
  
 @code {
     public class InQuestion
@@ -81,10 +86,10 @@
 
 
 
-  public int listcount; public int totfinal;
+    public int listcount; public int totfinal;
     public string codex; public string  jsonstring ; public bool statcode;
     List<InQuestion> Questions = new List<InQuestion>();
-    public int number;int years =1;decimal interest; int totalquestions;     int     maxnumber;int amount=1000; decimal imint;int final;
+    public int number;int years =1;decimal interest; int totalquestions;     int     maxnumber;int amount=1000; decimal imint;int final; int finalcompound;
 
 
 
@@ -95,6 +100,8 @@
 
 
         string jwturl = "https://quizapijwt.azurewebsites.net/api/";
+
+
 
 
 
@@ -120,15 +127,33 @@
                     Questions = JsonConvert.DeserializeObject<List<InQuestion>>(jsonstring);
                     Questions =Questions.OrderBy(x => x.DaysBegin).ToList();
                     listcount = Questions.Count();
+                    var imint = (from l in Questions
+                                 where l.DaysBegin == years
+                                 select l.Interest).FirstOrDefault();
+                    decimal amt = amount;
+
+                    decimal finint = Decimal.Multiply(amt, imint);
+                    interest = Decimal.Multiply(finint, years);
+                    final = (int)Math.Round((interest / 100) + amt);
+
+
+                    double citotal; int t = 0;
+                    double ciint; decimal cifinal = 0.0M;
+                    ciint = (double)imint;
+                    int annualCompound = 200;
+                    cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2 * years)));
+
+                    //     cifinal = Decimal.Multiply(amt, (decimal)ciint);
+
+
+                    finalcompound = (int)Math.Round(cifinal);
 
 
 
-
-               
                 }
                 catch (Exception ex)
                 {   }
-              
+
 
             }
         }
@@ -150,18 +175,29 @@
 
         try
         { 
-             
-    var    imint  =  (from l in Questions
-                       where l.DaysBegin == years
-                       select l.Interest).FirstOrDefault() ; 
 
-               
-      
-        decimal amt = amount;
-      
-       decimal  finint= Decimal.Multiply(amt, imint)   ;   
-        interest=Decimal.Multiply( finint,years);
-         final= (int)Math.Round((interest/100));
+            var    imint  =  (from l in Questions
+                         where l.DaysBegin == years
+                         select l.Interest).FirstOrDefault() ; 
+
+
+
+            decimal amt = amount;
+
+            decimal  finint= Decimal.Multiply(amt, imint)   ;   
+            interest=Decimal.Multiply( finint,years);
+            final = (int)Math.Round((interest / 100) + amt);
+            int annualCompound =  200;
+            double citotal; int t = 0;
+            double ciint; decimal cifinal=0.0M;
+            ciint =  (double)imint ;
+            
+                cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2*years)));
+
+           //     cifinal = Decimal.Multiply(amt, (decimal)ciint);
+            
+
+            finalcompound = (int)Math.Round(cifinal);
         }
         catch (Exception ex)
         {
