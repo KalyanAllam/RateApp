@@ -15,6 +15,9 @@
             <th>Year</th>
              
             <th>Interest p.a</th>
+
+
+            <th>Sr Interest p.a</th>
              
         </tr>
     </thead>
@@ -26,6 +29,8 @@
                 <td>@inques.DaysBegin</td>
                 
                 <td>@inques.Interest</td>
+
+                <td>@inques.SrInterest</td>
                  
             </tr>}
 </tbody>
@@ -38,7 +43,7 @@
         <p>Deposit Amount INR</p>
     </div>
  
-<input type="range" min="5000" max="50000" step="5000" @bind="@amount"
+<input type="range" min="1000" max="50000" step="1000" @bind="@amount"
     @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
 
 <p>@amount</p>
@@ -53,19 +58,41 @@
 
 <p>@years</p>
 
- 
+
+<br />
+<div class="row">
+    <input type="range" min="0" max="1" step="1" @bind="@srcitizen"
+    @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
+</div>
+
+
+@if (srcitizen > 0)
+{
+      <p>Sr Citizen</p>
+}
+
+
+@if (srcitizen == 0)
+{
+    <p>Non Sr Citizen</p>
+}
+
 @if(listcount>0)
 { 
 <div>
     <div class="col-md-3">
-        <p>Total Amount INR(Rounded, Simple and not compounded)</p>
+            <p>Maturity Amount INR(Rounded, Simple and not compounded)</p>
     </div>
     <div>@final</div>
         <div class="col-md-3">
-            <p>Total Amount INR(Rounded ,Compunded Halfyearly)</p>
+            <p>Maturity Amount INR(Rounded ,Compunded Halfyearly)</p>
         </div>
         <div>@finalcompound</div>
-    
+
+
+        
+
+
 </div>
 }
  
@@ -85,11 +112,12 @@
     }
 
 
-
+    public int srcitizen;
     public int listcount; public int totfinal;
     public string codex; public string  jsonstring ; public bool statcode;
     List<InQuestion> Questions = new List<InQuestion>();
-    public int number;int years =1;decimal interest; int totalquestions;     int     maxnumber;int amount=1000; decimal imint;int final; int finalcompound;
+    public int number; int years = 1; decimal interest; decimal srinterest; int totalquestions; int maxnumber; int amount = 1000; decimal imint; int final; int finalcompound;
+    decimal imstint; int srfinal; int srfinalcompound;
 
 
 
@@ -148,7 +176,23 @@
 
                     finalcompound = (int)Math.Round(cifinal);
 
+                    var srimint = (from l in Questions
+                                   where l.DaysBegin == years
+                                   select l.SrInterest).FirstOrDefault();
 
+
+                    //
+                    decimal srfinint = Decimal.Multiply(amt, srimint);
+                    srinterest = Decimal.Multiply(srfinint, years);
+                    srfinal = (int)Math.Round((srinterest / 100) + amt);
+
+                    //
+
+                    double srciint; decimal srcifinal = 0.0M;
+                    srciint = (double)srimint;
+                    srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
+
+                    srfinalcompound = (int)Math.Round(srcifinal);
 
                 }
                 catch (Exception ex)
@@ -180,6 +224,9 @@
                          where l.DaysBegin == years
                          select l.Interest).FirstOrDefault() ; 
 
+            var srimint = (from l in Questions
+                           where l.DaysBegin == years
+                           select l.SrInterest).FirstOrDefault();
 
 
             decimal amt = amount;
@@ -187,17 +234,34 @@
             decimal  finint= Decimal.Multiply(amt, imint)   ;   
             interest=Decimal.Multiply( finint,years);
             final = (int)Math.Round((interest / 100) + amt);
-            int annualCompound =  200;
-            double citotal; int t = 0;
-            double ciint; decimal cifinal=0.0M;
-            ciint =  (double)imint ;
-            
-                cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2*years)));
 
-           //     cifinal = Decimal.Multiply(amt, (decimal)ciint);
-            
+
+            decimal srfinint = Decimal.Multiply(amt, srimint);
+            srinterest=Decimal.Multiply(srfinint, years);
+            srfinal = (int)Math.Round((srinterest / 100) + amt);
+            int annualCompound =  200;
+            //   int t = 0;
+            double ciint; decimal cifinal=0.0M;
+            double srciint; decimal srcifinal = 0.0M;
+            ciint =  (double)imint ;
+            srciint = (double)srimint;
+
+            cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2*years)));
+
+            srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
+
+
 
             finalcompound = (int)Math.Round(cifinal);
+            srfinalcompound = (int)Math.Round(srcifinal);
+
+
+            if (srcitizen > 0)
+            {
+                finalcompound = srfinalcompound;
+                final = srfinal;
+
+            }
         }
         catch (Exception ex)
         {
