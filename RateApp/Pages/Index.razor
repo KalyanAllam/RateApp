@@ -77,6 +77,35 @@
     <p>Non Sr Citizen</p>
 }
 
+
+<div class="row">
+
+    <div class="col-md-3">
+        <p>Deposit Amount INR</p>
+    </div>
+
+    <p>@amount</p>
+</div>
+
+
+<br />
+<div class="row">
+    <p>Years:</p>
+
+    <p>@years</p>
+</div>
+
+<br />
+<div class="row">
+    <p>Interest:</p>
+
+    <p>@dispint</p>
+</div>
+
+
+
+
+
 @if(listcount>0)
 { 
 <div>
@@ -116,8 +145,8 @@
     public int listcount; public int totfinal;
     public string codex; public string  jsonstring ; public bool statcode;
     List<InQuestion> Questions = new List<InQuestion>();
-    public int number; int years = 1; decimal interest; decimal srinterest; int totalquestions; int maxnumber; int amount = 1000; decimal imint; int final; int finalcompound;
-    decimal imstint; int srfinal; int srfinalcompound;
+    public int number; int years = 1; decimal interest; decimal srinterest; int totalquestions; int maxnumber; int amount = 1000; decimal imint; int final; int finalcompound;decimal dispint;
+    decimal imstint; int srfinal; int srfinalcompound; 
 
 
 
@@ -194,6 +223,8 @@
 
                     srfinalcompound = (int)Math.Round(srcifinal);
 
+                    dispint = imint;
+
                 }
                 catch (Exception ex)
                 {   }
@@ -254,12 +285,13 @@
 
             finalcompound = (int)Math.Round(cifinal);
             srfinalcompound = (int)Math.Round(srcifinal);
-
+            dispint = imint;
 
             if (srcitizen > 0)
             {
                 finalcompound = srfinalcompound;
                 final = srfinal;
+                dispint = srimint;
 
             }
         }
