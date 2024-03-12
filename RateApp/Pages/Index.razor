@@ -76,8 +76,27 @@
 {
     <p>Non Sr Citizen</p>
 }
+<br />
+<div class="row">
+    <input type="range" min="0" max="2" step="1" @bind="@cumulative"
+    @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
+</div>
+
+@if (cumulative == 0)
+{
+     <p>Interest Non Cumulative</p>
+}
+
+@if (cumulative == 1)
+{
+    <p>Interest Cumulated Quarterly</p>
+}
 
 
+@if (cumulative == 2)
+{
+    <p>Interest Cumulated Semi annual</p>
+}
 <div class="row">
 
     <div class="col-md-3">
@@ -110,13 +129,10 @@
 { 
 <div>
     <div class="col-md-3">
-            <p>Maturity Amount INR(Rounded, Simple and not compounded)</p>
+            <p>Maturity Amount INR </p>
     </div>
     <div>@final</div>
-        <div class="col-md-3">
-            <p>Maturity Amount INR(Rounded ,Compunded Halfyearly)</p>
-        </div>
-        <div>@finalcompound</div>
+       
 
 
         
@@ -146,7 +162,7 @@
     public string codex; public string  jsonstring ; public bool statcode;
     List<InQuestion> Questions = new List<InQuestion>();
     public int number; int years = 1; decimal interest; decimal srinterest; int totalquestions; int maxnumber; int amount = 1000; decimal imint; int final; int finalcompound;decimal dispint;
-    decimal imstint; int srfinal; int srfinalcompound; 
+    decimal imstint; int srfinal; int srfinalcompound;  int cumulative;
 
 
 
@@ -262,35 +278,59 @@
 
             decimal amt = amount;
 
-            decimal  finint= Decimal.Multiply(amt, imint)   ;   
-            interest=Decimal.Multiply( finint,years);
-            final = (int)Math.Round((interest / 100) + amt);
+
+            if (cumulative == 0)
+            {
+                decimal finint = Decimal.Multiply(amt, imint);
+                interest = Decimal.Multiply(finint, years);
+                final = (int)Math.Round((interest / 100) + amt);
 
 
-            decimal srfinint = Decimal.Multiply(amt, srimint);
-            srinterest=Decimal.Multiply(srfinint, years);
-            srfinal = (int)Math.Round((srinterest / 100) + amt);
-            int annualCompound =  200;
-            //   int t = 0;
-            double ciint; decimal cifinal=0.0M;
-            double srciint; decimal srcifinal = 0.0M;
-            ciint =  (double)imint ;
-            srciint = (double)srimint;
+                decimal srfinint = Decimal.Multiply(amt, srimint);
+                srinterest = Decimal.Multiply(srfinint, years);
+                srfinal = (int)Math.Round((srinterest / 100) + amt);
+            }
+            double ciint; double srciint; decimal cifinal = 0.0M;
+            decimal srcifinal = 0.0M;
+            if (cumulative == 2)
+            {
+                int annualCompound = 200;
+                //   int t = 0;
 
-            cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2*years)));
+                ciint = (double)imint;
+                srciint = (double)srimint;
 
-            srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
+                cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2 * years)));
 
+                srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
 
+            }
+            else
+            {
+                int annualCompound = 400;
+                //   int t = 0;
 
-            finalcompound = (int)Math.Round(cifinal);
+                ciint = (double)imint;
+                srciint = (double)srimint;
+
+                cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (4 * years)));
+
+                srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (4 * years)));
+            }
+            if (cumulative > 0)
+            {
+                finalcompound = (int)Math.Round(cifinal);
+                final = finalcompound;
+            }
             srfinalcompound = (int)Math.Round(srcifinal);
             dispint = imint;
 
             if (srcitizen > 0)
             {
-                finalcompound = srfinalcompound;
-                final = srfinal;
+                if (cumulative == 0)
+                { final = srfinal; }
+                else
+                { final = srfinalcompound; }
                 dispint = srimint;
 
             }
