@@ -305,7 +305,7 @@
                 srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
 
             }
-            else
+            if (cumulative == 1)
             {
                 int annualCompound = 400;
                 //   int t = 0;
