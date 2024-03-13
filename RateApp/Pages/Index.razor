@@ -61,8 +61,11 @@
 
 <br />
 <div class="row">
-    <input type="range" min="0" max="1" step="1" @bind="@srcitizen"
-    @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
+    <select @bind="@srcitizen"
+    @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" >
+    <option value="0">Non Sr Citizen</option>
+        <option value="1">Sr Citizen</option>
+        </select>
 </div>
 
 
@@ -78,8 +81,12 @@
 }
 <br />
 <div class="row">
-    <input type="range" min="0" max="2" step="1" @bind="@cumulative"
-    @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
+    <select @bind="@cumulative"
+    @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" >
+        <option value="0">Interest Non Cumulative</option>
+        <option value="1">Interest Cumulated Quarterly</option>
+        <option value="2">Interest Cumulated Semi annually</option>
+    </select>
 </div>
 
 @if (cumulative == 0)
