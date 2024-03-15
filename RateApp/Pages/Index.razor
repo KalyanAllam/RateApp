@@ -8,33 +8,7 @@
  
  
  
-<table class="table">
-    <thead>
-        <tr>
-           
-            <th>Year</th>
-             
-            <th>Interest p.a</th>
 
-
-            <th>Sr Interest p.a</th>
-             
-        </tr>
-    </thead>
-<tbody>
-@foreach (InQuestion inques in Questions)
-{
-    // Pass the Dto properties to the component
-     <tr>
-                <td>@inques.DaysBegin</td>
-                
-                <td>@inques.Interest</td>
-
-                <td>@inques.SrInterest</td>
-                 
-            </tr>}
-</tbody>
-</table>
  
  
 <div class="row">
@@ -43,7 +17,7 @@
         <p>Deposit Amount INR</p>
     </div>
  
-<input type="range" min="1000" max="50000" step="1000" @bind="@amount"
+<input type="range" min="1000" max="100000" step="1000" @bind="@amount"
     @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" />
 
 <p>@amount</p>
