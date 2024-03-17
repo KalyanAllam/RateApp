@@ -5,11 +5,13 @@
 @using Newtonsoft.Json;
 
 @using RateApp.Models;
- 
- 
- 
 
- 
+
+
+
+
+@if (listcount > 0)
+{
  
 <div class="row">
       
@@ -59,7 +61,10 @@
     @onchange="@UpdateCurrentInterestValue" @bind:event="oninput" >
         <option value="0">Interest Non Cumulative</option>
         <option value="1">Interest Cumulated Quarterly</option>
-        <option value="2">Interest Cumulated Semi annually</option>
+            <option value="2">Interest Cumulated Semi annually</option>
+            
+            <option value="3">Interest Cumulated Annually</option>
+
     </select>
 </div>
 
@@ -78,6 +83,15 @@
 {
     <p>Interest Cumulated Semi annual</p>
 }
+
+
+
+    @if (cumulative == 3)
+    {
+        <p>Interest Cumulated Annual</p>
+    }
+
+
 <div class="row">
 
     <div class="col-md-3">
@@ -106,8 +120,7 @@
 
 
 
-@if(listcount>0)
-{ 
+ 
 <div>
     <div class="col-md-3">
             <p>Maturity Amount INR </p>
@@ -120,6 +133,12 @@
 
 
 </div>
+}
+
+
+@if(listcount==0)
+{
+    <p>Loading... </p>
 }
  
 @code {
@@ -273,6 +292,22 @@
             }
             double ciint; double srciint; decimal cifinal = 0.0M;
             decimal srcifinal = 0.0M;
+
+
+            if (cumulative == 3)
+            {
+                int annualCompound = 100;
+                //   int t = 0;
+
+                ciint = (double)imint;
+                srciint = (double)srimint;
+
+                cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (1 * years)));
+
+                srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (1 * years)));
+
+            }
+          
             if (cumulative == 2)
             {
                 int annualCompound = 200;
