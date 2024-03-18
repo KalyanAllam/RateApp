@@ -161,8 +161,8 @@
     public int listcount; public int totfinal;
     public string codex; public string  jsonstring ; public bool statcode;
     List<InQuestion> Questions = new List<InQuestion>();
-    public int number; int years = 1; decimal interest; decimal srinterest; int totalquestions; int maxnumber; int amount = 1000; decimal imint; int final; int finalcompound;decimal dispint;
-    decimal imstint; int srfinal; int srfinalcompound;  int cumulative;
+    public int number; int years = 1; decimal interest; decimal srinterest; int totalquestions; int maxnumber; int amount = 1000; decimal imint; decimal final; decimal finalcompound; decimal dispint;
+    decimal imstint; decimal srfinal; decimal srfinalcompound; decimal cumulative;
 
 
 
@@ -207,7 +207,7 @@
 
                     decimal finint = Decimal.Multiply(amt, imint);
                     interest = Decimal.Multiply(finint, years);
-                    final = (int)Math.Round((interest / 100) + amt);
+                    final =  Math.Round(((interest / 100) + amt),2);
 
 
                     double citotal; int t = 0;
@@ -216,10 +216,9 @@
                     int annualCompound = 200;
                     cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2 * years)));
 
-                    //     cifinal = Decimal.Multiply(amt, (decimal)ciint);
+                 
 
-
-                    finalcompound = (int)Math.Round(cifinal);
+                    finalcompound =  Math.Round(cifinal,2);
 
                     var srimint = (from l in Questions
                                    where l.DaysBegin == years
@@ -229,7 +228,7 @@
                     //
                     decimal srfinint = Decimal.Multiply(amt, srimint);
                     srinterest = Decimal.Multiply(srfinint, years);
-                    srfinal = (int)Math.Round((srinterest / 100) + amt);
+                    srfinal =  Math.Round(((srinterest / 100) + amt),2);
 
                     //
 
@@ -237,7 +236,7 @@
                     srciint = (double)srimint;
                     srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
 
-                    srfinalcompound = (int)Math.Round(srcifinal);
+                    srfinalcompound =  Math.Round(srcifinal,2);
 
                     dispint = imint;
 
@@ -283,12 +282,12 @@
             {
                 decimal finint = Decimal.Multiply(amt, imint);
                 interest = Decimal.Multiply(finint, years);
-                final = (int)Math.Round((interest / 100) + amt);
+                final =  Math.Round(((interest / 100) + amt),2);
 
 
                 decimal srfinint = Decimal.Multiply(amt, srimint);
                 srinterest = Decimal.Multiply(srfinint, years);
-                srfinal = (int)Math.Round((srinterest / 100) + amt);
+                srfinal =  Math.Round(((srinterest / 100) + amt),2);
             }
             double ciint; double srciint; decimal cifinal = 0.0M;
             decimal srcifinal = 0.0M;
@@ -335,10 +334,10 @@
             }
             if (cumulative > 0)
             {
-                finalcompound = (int)Math.Round(cifinal);
+                finalcompound =  Math.Round(cifinal,2);
                 final = finalcompound;
             }
-            srfinalcompound = (int)Math.Round(srcifinal);
+            srfinalcompound =  Math.Round(srcifinal,2);
             dispint = imint;
 
             if (srcitizen > 0)
