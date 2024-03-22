@@ -142,7 +142,7 @@
 }
  
 @code {
- 
+
     QuestionsDatabase questionsDatabase;
     public int srcitizen;
     public int listcount; public int totfinal;
@@ -157,7 +157,7 @@
     protected override async Task OnInitializedAsync()
     {
 
-
+        string connecteddb = "N";
 
         string jwturl = "https://quizapijwt.azurewebsites.net/api/";
 
@@ -174,83 +174,143 @@
 
             client1.DefaultRequestHeaders.Clear();
             client1.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            HttpResponseMessage response = null;
+            try
+            { 
+                response = await client1.GetAsync("RateCards");
 
-            HttpResponseMessage response = await client1.GetAsync("RateCards");
-
-            if (response.IsSuccessStatusCode)
+            }
+            catch (Exception ex)
             {
-                //Storing the response details recieved from web api
-              
-                List<InQuestion> itemInTheDB = await questionsDatabase.GetItemsAsync();
+                Questions = await questionsDatabase.GetItemsAsync();
 
-                foreach (InQuestion item in itemInTheDB)
+
+                Questions = Questions.OrderBy(x => x.DaysBegin).ToList();
+                listcount = Questions.Count();
+                var imint = (from l in Questions
+                             where l.DaysBegin == years
+                             select l.Interest).FirstOrDefault();
+                decimal amt = amount;
+
+                decimal finint = Decimal.Multiply(amt, imint);
+                interest = Decimal.Multiply(finint, years);
+                final = Math.Round(((interest / 100) + amt), 2);
+
+
+                double citotal; int t = 0;
+                double ciint; decimal cifinal = 0.0M;
+                ciint = (double)imint;
+                int annualCompound = 200;
+                cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2 * years)));
+
+
+
+                finalcompound = Math.Round(cifinal, 2);
+
+                var srimint = (from l in Questions
+                               where l.DaysBegin == years
+                               select l.SrInterest).FirstOrDefault();
+
+
+                //
+                decimal srfinint = Decimal.Multiply(amt, srimint);
+                srinterest = Decimal.Multiply(srfinint, years);
+                srfinal = Math.Round(((srinterest / 100) + amt), 2);
+
+                //
+
+                double srciint; decimal srcifinal = 0.0M;
+                srciint = (double)srimint;
+                srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
+
+                srfinalcompound = Math.Round(srcifinal, 2);
+
+                dispint = imint; connecteddb = "Y";
+            }
+
+
+
+
+            if (connecteddb == "N")
+            {
+                if (response.IsSuccessStatusCode)
                 {
-                    var result = Questions.FirstOrDefault(c => c.No == item.No);
+                    //Storing the response details recieved from web api
 
-                    if (result == null)
+                    List<InQuestion> itemInTheDB = await questionsDatabase.GetItemsAsync();
+
+                    foreach (InQuestion item in itemInTheDB)
                     {
-                        await questionsDatabase.DeleteItemAsync(item);
+                        var result = Questions.FirstOrDefault(c => c.No == item.No);
+
+                        if (result == null)
+                        {
+                            await questionsDatabase.DeleteItemAsync(item);
+                        }
                     }
-                }
 
-         
- 
-                try
-                {
-                    jsonstring = await response.Content.ReadAsStringAsync();
-                    Questions = JsonConvert.DeserializeObject<List<InQuestion>>(jsonstring);
 
-                    foreach (InQuestion itemdb in Questions)
+
+                    try
                     {
-                        await questionsDatabase.SaveItemAsync(itemdb);
+                        jsonstring = await response.Content.ReadAsStringAsync();
+                        Questions = JsonConvert.DeserializeObject<List<InQuestion>>(jsonstring);
+                        //       connected = "Y";
+                        foreach (InQuestion itemdb in Questions)
+                        {
+                            await questionsDatabase.SaveItemAsync(itemdb);
+                        }
+                        Questions = Questions.OrderBy(x => x.DaysBegin).ToList();
+                        listcount = Questions.Count();
+                        var imint = (from l in Questions
+                                     where l.DaysBegin == years
+                                     select l.Interest).FirstOrDefault();
+                        decimal amt = amount;
+
+                        decimal finint = Decimal.Multiply(amt, imint);
+                        interest = Decimal.Multiply(finint, years);
+                        final = Math.Round(((interest / 100) + amt), 2);
+
+
+                        double citotal; int t = 0;
+                        double ciint; decimal cifinal = 0.0M;
+                        ciint = (double)imint;
+                        int annualCompound = 200;
+                        cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2 * years)));
+
+
+
+                        finalcompound = Math.Round(cifinal, 2);
+
+                        var srimint = (from l in Questions
+                                       where l.DaysBegin == years
+                                       select l.SrInterest).FirstOrDefault();
+
+
+                        //
+                        decimal srfinint = Decimal.Multiply(amt, srimint);
+                        srinterest = Decimal.Multiply(srfinint, years);
+                        srfinal = Math.Round(((srinterest / 100) + amt), 2);
+
+                        //
+
+                        double srciint; decimal srcifinal = 0.0M;
+                        srciint = (double)srimint;
+                        srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
+
+                        srfinalcompound = Math.Round(srcifinal, 2);
+
+                        dispint = imint;
+
                     }
-                    Questions =Questions.OrderBy(x => x.DaysBegin).ToList();
-                    listcount = Questions.Count();
-                    var imint = (from l in Questions
-                                 where l.DaysBegin == years
-                                 select l.Interest).FirstOrDefault();
-                    decimal amt = amount;
-
-                    decimal finint = Decimal.Multiply(amt, imint);
-                    interest = Decimal.Multiply(finint, years);
-                    final =  Math.Round(((interest / 100) + amt),2);
+                    catch (Exception ex)
+                    {
 
 
-                    double citotal; int t = 0;
-                    double ciint; decimal cifinal = 0.0M;
-                    ciint = (double)imint;
-                    int annualCompound = 200;
-                    cifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + ciint / annualCompound), (2 * years)));
 
-                 
-
-                    finalcompound =  Math.Round(cifinal,2);
-
-                    var srimint = (from l in Questions
-                                   where l.DaysBegin == years
-                                   select l.SrInterest).FirstOrDefault();
-
-
-                    //
-                    decimal srfinint = Decimal.Multiply(amt, srimint);
-                    srinterest = Decimal.Multiply(srfinint, years);
-                    srfinal =  Math.Round(((srinterest / 100) + amt),2);
-
-                    //
-
-                    double srciint; decimal srcifinal = 0.0M;
-                    srciint = (double)srimint;
-                    srcifinal = Decimal.Multiply(amt, (decimal)Math.Pow((1 + srciint / annualCompound), (2 * years)));
-
-                    srfinalcompound =  Math.Round(srcifinal,2);
-
-                    dispint = imint;
+                    }
 
                 }
-                catch (Exception ex)
-                {   }
-
-
             }
         }
 
