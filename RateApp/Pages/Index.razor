@@ -142,21 +142,8 @@
 }
  
 @code {
-    public class InQuestion
-    { 
-        public int No { get; set; }
-
-        public int DaysBegin { get; set; }
-
-        public int DaysEnd { get; set; }
-
-        public decimal Interest { get; set; }
-
-        public decimal SrInterest { get; set; }
-
-    }
-
-
+ 
+    QuestionsDatabase questionsDatabase;
     public int srcitizen;
     public int listcount; public int totfinal;
     public string codex; public string  jsonstring ; public bool statcode;
@@ -182,7 +169,7 @@
         {
 
 
-
+            questionsDatabase = new QuestionsDatabase();
             client1.BaseAddress = new Uri(jwturl);
 
             client1.DefaultRequestHeaders.Clear();
@@ -193,11 +180,30 @@
             if (response.IsSuccessStatusCode)
             {
                 //Storing the response details recieved from web api
-                jsonstring = await response.Content.ReadAsStringAsync();
+              
+                List<InQuestion> itemInTheDB = await questionsDatabase.GetItemsAsync();
 
+                foreach (InQuestion item in itemInTheDB)
+                {
+                    var result = Questions.FirstOrDefault(c => c.No == item.No);
+
+                    if (result == null)
+                    {
+                        await questionsDatabase.DeleteItemAsync(item);
+                    }
+                }
+
+         
+ 
                 try
                 {
+                    jsonstring = await response.Content.ReadAsStringAsync();
                     Questions = JsonConvert.DeserializeObject<List<InQuestion>>(jsonstring);
+
+                    foreach (InQuestion itemdb in Questions)
+                    {
+                        await questionsDatabase.SaveItemAsync(itemdb);
+                    }
                     Questions =Questions.OrderBy(x => x.DaysBegin).ToList();
                     listcount = Questions.Count();
                     var imint = (from l in Questions
